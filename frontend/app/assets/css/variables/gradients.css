@@ -1,0 +1,8 @@
+/**
+* Contains global gradients variables to be used with tailwind
+*/
+
+@theme {
+  --color-grad-primary: linear-gradient(135deg, #2c8896 0%, #1d5963 100%);
+  --color-grad-primary2: linear-gradient(to right, #2c8896 0%, #66a8b3 100%);
+}

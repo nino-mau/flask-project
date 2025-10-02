@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+@import './variables/index.css';
+
+/**
+* Contains global styles for the application
+*/
+
+:root {
+  font-family: Inter, sans-serif;
+}

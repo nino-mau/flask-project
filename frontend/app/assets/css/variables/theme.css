@@ -1,0 +1,7 @@
+/**
+* File that contains your tailwindcss theme variables
+*/
+
+@theme static {
+  --font-display: 'Inter', 'sans-serif';
+}
