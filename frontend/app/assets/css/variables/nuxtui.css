@@ -2,6 +2,12 @@
 * File that contains nuxtui variables you wish to override
 */
 
+/* For light mode */
 :root {
   /* --ui-text-highlighted: #2d374b !important; */
+}
+
+/* For dark mode */
+.dark {
+  /* --ui-bg: var(--color-base-900); */
 }

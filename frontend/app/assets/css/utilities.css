@@ -1,0 +1,12 @@
+/* Custom utility class to apply linear gradients to backgrounds */
+@utility grad-* {
+  background: --value(--color-grad-*);
+}
+
+/* Custom utility class to apply linear gradients to text */
+@utility grad-text-* {
+  background: --value(--color-grad-*);
+  background-clip: text;
+  display: inline-block;
+  color: transparent;
+}
