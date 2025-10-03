@@ -1,15 +1,32 @@
+import os
+import uuid
+import base64
+
+import cloudinary
+import cloudinary.uploader
+import psycopg2
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from ollama import Client
-from dotenv import load_dotenv
-import psycopg2, os, cloudinary, cloudinary.uploader, json
+from model import Image, db
+from services.ollama import OllamaService
+
 
 load_dotenv()
 
-ollama_model = os.getenv("OLLAMA_MODEL") or "gemma:2b-instruct-q4_K_M"
-
 app = Flask(__name__)
+
+# Configure ORM
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+db.init_app(app)
+
+# Configure CORS
+
 CORS(app)
+
+with app.app_context():
+    db.create_all()
 
 
 def get_db_connection():

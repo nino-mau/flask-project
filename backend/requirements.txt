@@ -6,3 +6,4 @@ requests
 ollama
 dotenv
 cloudinary
+flask_sqlalchemy
