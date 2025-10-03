@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import * as z from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui';
+import * as z from 'zod';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MIN_DIMENSIONS = { width: 200, height: 200 };
@@ -118,7 +118,14 @@ const state = reactive<Partial<schema>>({
 });
 
 async function onSubmit(event: FormSubmitEvent<schema>) {
-  console.log(event.data);
+  const formData = new FormData();
+  formData.append('file', event.data.image);
+  console.log(formData);
+  const { data } = await $fetch('/api/upload', {
+    method: 'POST',
+    body: formData
+  });
+  console.log(data);
 }
 </script>
 

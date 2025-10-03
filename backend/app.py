@@ -1,8 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from ollama import Client
 from dotenv import load_dotenv
-import psycopg2, os, json, requests
+import psycopg2, os, cloudinary, cloudinary.uploader, json
 
 load_dotenv()
 
@@ -27,6 +27,29 @@ def hello():
     )
 
     return jsonify({"msg": res["message"]["content"]})
+
+
+@app.post("/api/upload")
+def upload_file():
+    app.logger.info("[In /api/upload route]")
+    app.logger.info(f"Request files: {list(request.files.keys())}")
+    cloudinary.config(
+        cloud_name=os.getenv("CLOUDINARY_NAME"),
+        api_key=os.getenv("CLOUDINARY_API_KEY"),
+        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    )
+
+    upload_result = None
+    if request.method == "POST":
+        file_to_upload = request.files["file"]
+        app.logger.info("%s file_to_upload", file_to_upload)
+        if file_to_upload:
+            upload_result = cloudinary.uploader.upload(
+                file_to_upload, folder="flask_project_uploads/"
+            )
+        app.logger.info(upload_result)
+        return jsonify(upload_result)
+    return jsonify({"msg": "Should be a post request"})
 
 
 @app.route("/api/users")
