@@ -14,7 +14,20 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/image', '@pinia/nuxt'],
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/ui',
+    '@nuxt/image',
+    '@pinia/nuxt',
+    'nuxt-lottie'
+  ],
+
+  lottie: {
+    componentName: 'Lottie', // Optional: Customize the component name
+    lottieFolder: '/assets/lottie', // Optional: Customize the Lottie folder path
+    autoFolderCreation: true, // Optional: Auto create lottie folder (default: true)
+    enableLogs: true // Optional: Enable console logs from module (default: true)
+  },
 
   // Font configuration
   fonts: {
@@ -39,3 +52,4 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' }
   }
 });
+
