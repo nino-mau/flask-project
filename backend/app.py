@@ -1,6 +1,8 @@
 import os
 import uuid
 import base64
+import json
+import re
 
 import cloudinary
 import cloudinary.uploader
@@ -8,7 +10,7 @@ import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from model import Image, db
+from model import Character, Image, db
 from services.ollama import OllamaService
 
 
@@ -138,16 +140,33 @@ def create_character():
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
         ollama = OllamaService(host="http://ollama:11434")
-        result = ollama.query(
-            "Create json object containing the following fields: name (Name of that character), description (Descrpition of that character)",
-            "Your goal is to generate characters card basing yourself on the image provided in the prompts and the specific instructions",
+        res_raw = ollama.query(
+            "Create a JSON object containing: name (Name of that character), (Description of that character)",
+            "Your goal is to generate characters card based on the image provided. Respond ONLY with valid JSON, no markdown formatting.",
             image_base64,
         )
+
+        app.logger.info(upload_result)
+
+        # Add the character to the db
+        res_cleaned = re.sub(r"```json\n?|\n?```", "", res_raw).strip()
+        try:
+            character_data = json.loads(res_cleaned)
+        except json.JSONDecodeError as e:
+            app.logger.error(f"JSON decode error: {e}")
+            return jsonify({"error": "Failed to parse LLM response"}), 500
+        character = Character()
+        character.id = character_id = str(uuid.uuid4())
+        character.name = character_data["name"] or ""
+        character.description = character_data["description"] or res_raw
+        app.logger.info(character)
+        db.session.add(character)
+        db.session.commit()
 
         return jsonify(
             {
                 "msg": "success",
-                "res": result,
+                "res": res_raw,
                 "id": image_id,
                 "hash": upload_result["secure_url"],
             }
