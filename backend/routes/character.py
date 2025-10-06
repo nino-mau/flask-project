@@ -16,6 +16,55 @@ character_bp = Blueprint("character_bp", __name__)
 
 
 """
+@DELETE /API/CHARACTER
+
+Delete character 
+"""
+
+
+@character_bp.delete("")
+def get_character():
+    app.logger.info("[In @GET/API/CHARACTER route]")
+
+
+"""
+@GET /API/CHARACTER
+
+Get character 
+"""
+
+
+@character_bp.get("")
+def get_character():
+    app.logger.info("[In @GET/API/CHARACTER route]")
+
+    character_id = request.args.get("character_id")
+
+    stmt = db.select(Character).where(Character.id == character_id)
+    result = db.session.execute(stmt).scalars().one()
+
+    if not result:
+        return jsonify({"character": [], "msg": "Character doesn't exist"}), 500
+
+    payload = {
+        "id": result.id,
+        "name": result.name,
+        "description": result.description,
+        "ability1": result.ability1,
+        "ability2": result.ability2,
+        "ability1_description": result.ability1_description,
+        "ability2_description": result.ability2_description,
+        "image": {
+            "id": result.image.id if result.image else None,
+            "name": result.image.name if result.image else None,
+            "hash": result.image.hash if result.image else None,
+        },
+    }
+
+    return jsonify({"character": payload}), 200
+
+
+"""
 @POST /API/CHARACTER
 
 Create character 
@@ -24,7 +73,7 @@ Create character
 
 @character_bp.post("")
 def create_character():
-    app.logger.info("[In /api/character route]")
+    app.logger.info("[In @POST/API/CHARACTER route]")
     app.logger.info(f"Request files: {list(request.files.keys())}")
 
     if request.method == "POST":
@@ -92,7 +141,7 @@ def create_character():
         openrouter = OpenrouterService()
         res_raw = openrouter.query(
             "Your goal is to generate characters card based on the image provided. Respond ONLY with valid JSON, no markdown formatting. Do not make the field too long \n Create a JSON object containing: name: (Name of that character), description: (Description of that character), ability1: (First ability of character), ability2: (Second ability of character), ability1_description: (Description of ability 1), ability2_description: (Description of ability 2)",
-            image_base64,
+            image_hash,
         )
 
         app.logger.info(upload_result)
