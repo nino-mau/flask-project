@@ -7,3 +7,4 @@ ollama
 dotenv
 cloudinary
 flask_sqlalchemy
+openai

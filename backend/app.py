@@ -12,6 +12,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from model import Character, Image, db
 from services.ollama import OllamaService
+from services.openrouter import OpenrouterService
+from utils.images import image_to_base64
 
 
 load_dotenv()
@@ -48,49 +50,6 @@ Receive image, store it into the cloud with cloudinary and add it's hash to the 
 """
 
 
-@app.post("/api/image")
-def upload_file():
-    app.logger.info("[In /api/upload route]")
-    app.logger.info(f"Request files: {list(request.files.keys())}")
-
-    # Store image in cloudinary
-
-    cloudinary.config(
-        cloud_name=os.getenv("CLOUDINARY_NAME"),
-        api_key=os.getenv("CLOUDINARY_API_KEY"),
-        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-    )
-
-    upload_result = None
-
-    if request.method == "POST":
-        file_to_upload = request.files["file"]
-        app.logger.info("%s file_to_upload", file_to_upload.name)
-
-        # Attempt to upload file to cloud
-        if file_to_upload:
-            upload_result = cloudinary.uploader.upload(
-                file_to_upload, folder="flask_app_uploads/"
-            )
-        else:
-            return "File not found", 500
-        app.logger.info(upload_result)
-
-        # Store image hash in db
-        image = Image()
-        image_id = str(uuid.uuid4())
-        image.id = image_id
-        image.hash = upload_result["secure_url"]
-        db.session.add(image)
-        db.session.commit()
-
-        return jsonify(
-            {"msg": "success", "id": image_id, "hash": upload_result["secure_url"]}
-        ), 200
-
-    return "Request method invalid", 405
-
-
 """
 @POST /API/CHARACTER
 
@@ -116,38 +75,59 @@ def create_character():
         file_to_upload = request.files["file"]
         app.logger.info("%s file_to_upload", file_to_upload.filename)
 
-        # Upload image to cloudinary
-        if file_to_upload:
+        # Verify if image already exists by its name
+        existing = db.session.execute(
+            db.select(Image).filter_by(name=file_to_upload.filename)
+        ).scalar_one_or_none()
+
+        if existing:
+            app.logger.info("Image already exists: %s", existing.id)
+            image_hash = existing.hash
+            image_id = existing.id
+            image_base64 = image_to_base64(image_hash)
+        else:
+            # Upload image to cloudinary
+            if not file_to_upload:
+                return "File not found", 500
             upload_result = cloudinary.uploader.upload(
                 file_to_upload,
                 folder="flask_app_uploads/",
                 public_id=file_to_upload.filename,
                 display_name=file_to_upload.filename,
             )
-        else:
-            return "File not found", 500
-        app.logger.info(upload_result)
+            app.logger.info(upload_result)
 
-        # Store image hash in db
-        image = Image()
-        image_id = str(uuid.uuid4())
-        image.id = image_id
-        image.hash = upload_result["secure_url"]
-        image.name = file_to_upload.filename or upload_result["display_name"]
-        db.session.add(image)
-        db.session.commit()
+            # Store image hash in db
+            image = Image()
+            image_id = str(uuid.uuid4())
+            image.id = image_id
+            image_hash = upload_result["secure_url"]
+            image.hash = image_hash
+            image.name = (
+                file_to_upload.filename
+                or upload_result.get("display_name")
+                or str(uuid.uuid4())
+            )
+            db.session.add(image)
+            db.session.commit()
 
-        # Decode image for sending to LLM
-        file_to_upload.stream.seek(0)
-        image_bytes = file_to_upload.read()
-        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+            # Decode image for sending to LLM
+            file_to_upload.stream.seek(0)
+            image_bytes = file_to_upload.read()
+            image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
         # Query LLM for character info
-        ollama = OllamaService(host="http://ollama:11434")
-        res_raw = ollama.query(
-            "Create a JSON object containing: name: (Name of that character), description: (Description of that character), ability1: (First ability of character), ability2: (Second ability of character), ability1_description: (Description of ability 1), ability2_description: (Description of ability 2)",
-            "Your goal is to generate characters card based on the image provided. Respond ONLY with valid JSON, no markdown formatting.",
-            image_base64,
+        app.logger.info("Querying LLM for character info")
+        # ollama = OllamaService(host="http://ollama:11434")
+        # res_raw = ollama.query(
+        #     "Create a JSON object containing: name: (Name of that character), description: (Description of that character), ability1: (First ability of character), ability2: (Second ability of character), ability1_description: (Description of ability 1), ability2_description: (Description of ability 2)",
+        #     "Your goal is to generate characters card based on the image provided. Respond ONLY with valid JSON, no markdown formatting. Do not make the field too long",
+        #     image_base64,
+        # )
+        openrouter = OpenrouterService()
+        res_raw = openrouter.query(
+            "Your goal is to generate characters card based on the image provided. Respond ONLY with valid JSON, no markdown formatting. Do not make the field too long \n Create a JSON object containing: name: (Name of that character), description: (Description of that character), ability1: (First ability of character), ability2: (Second ability of character), ability1_description: (Description of ability 1), ability2_description: (Description of ability 2)",
+            image_hash,
         )
 
         app.logger.info(upload_result)
@@ -190,7 +170,7 @@ def create_character():
                     "ability1_description": character.ability1_description,
                     "ability2_description": character.ability2_description,
                     "image_id": character.image_id,
-                    "image_hash": upload_result["secure_url"],
+                    "image_hash": image_hash,
                 },
             }
         ), 200
