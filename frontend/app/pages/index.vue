@@ -128,6 +128,7 @@ async function onSubmit(event: FormSubmitEvent<schema>) {
    */
   const formData = new FormData();
   formData.append('file', event.data.image);
+  console.log(formData);
 
   try {
     isLoading.value = true;
