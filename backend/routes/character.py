@@ -23,8 +23,31 @@ Delete character
 
 
 @character_bp.delete("")
-def get_character():
-    app.logger.info("[In @GET/API/CHARACTER route]")
+def delete_character():
+    app.logger.info("[In @DELETE/API/CHARACTER route]")
+
+    character_id = request.args.get("character_id")
+
+    stmt = (
+        db.delete(Character)
+        .where(Character.id == character_id)
+        .returning(
+            Character.id,
+            Character.name,
+            Character.description,
+            Character.ability1,
+            Character.ability2,
+            Character.ability1_description,
+            Character.ability2_description,
+            Character.image_id,
+        )
+    )
+    row = db.session.execute(stmt).one_or_none()
+    if row is None:
+        return jsonify({"msg": "Character not found"}), 404
+    db.session.commit()
+
+    return "success", 200
 
 
 """
