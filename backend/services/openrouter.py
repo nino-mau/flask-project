@@ -10,7 +10,8 @@ class OpenrouterService:
         self,
         base_url: str = "https://openrouter.ai/api/v1",
         api_key: str = os.getenv("OPENROUTER_API_KEY") or "",
-        model: str = os.getenv("OPENROUTER_MODEL") or "google/gemma-3n-e4b-it:free",
+        model: str = os.getenv("OPENROUTER_MODEL")
+        or "qwen/qwen2.5-vl-32b-instruct:free",
     ):
         self.client = OpenAI(base_url=base_url, api_key=api_key)
         self.model = model
