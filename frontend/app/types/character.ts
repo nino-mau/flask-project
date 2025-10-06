@@ -6,6 +6,9 @@ export interface Character {
   ability2: string;
   ability1_description: string;
   ability2_description: string;
-  image_id: string;
-  image_hash?: string;
+  image: {
+    id: string;
+    name: string;
+    hash: string;
+  };
 }

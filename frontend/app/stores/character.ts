@@ -15,12 +15,32 @@ export const useCharacterStore = defineStore('characterStore', {
           body: formData
         });
 
-        // Add data to store
+        // Add character to store
         this.character = data._data.character;
         console.log(data);
       } finally {
         this.isLoading = false;
       }
+    },
+
+    async get(characterId: string) {
+      const data = await $fetch.raw(
+        `/api/character?character_id=${characterId}`
+      );
+
+      // Add character to store
+      this.character = data._data.character;
+      console.log(data);
+    },
+
+    async delete(characterId: string) {
+      const data = await $fetch.raw(
+        `/api/character?character_id=${characterId}`
+      );
+
+      // Add character to store
+      this.character = data._data.character;
+      console.log(data);
     }
   }
 });

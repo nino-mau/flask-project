@@ -13,8 +13,8 @@
             class="w-25 h-25 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
           >
             <NuxtImg
-              v-if="character?.image_hash"
-              :src="character.image_hash"
+              v-if="character?.image.hash"
+              :src="character.image.hash"
               :alt="character?.name || 'Character image'"
               class="size-full object-cover"
             />
