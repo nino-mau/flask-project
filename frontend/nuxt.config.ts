@@ -42,6 +42,13 @@ export default defineNuxtConfig({
         weights: [300, 400, 500, 600, 700, 800],
         styles: ['normal', 'italic'],
         display: 'swap'
+      },
+      {
+        name: 'Poppins',
+        provider: 'google',
+        weights: [300, 400, 500, 600, 700, 800],
+        styles: ['normal', 'italic'],
+        display: 'swap'
       }
     ]
   },
@@ -52,4 +59,3 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' }
   }
 });
-

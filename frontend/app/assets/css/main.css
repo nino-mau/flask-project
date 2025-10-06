@@ -6,9 +6,8 @@
 /**
 * Contains global styles for the application
 */
-
 :root {
-  font-family: Inter, sans-serif;
+  font-family: Inter, Poppins, sans-serif;
 }
 
 body {
