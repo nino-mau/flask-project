@@ -6,7 +6,7 @@
     </template>
     <template #right>
       <div class="flex flex-row gap-9">
-        <ULink as="button">Home</ULink>
+        <ULink as="button" to="/">Home</ULink>
         <ULink as="button">Characters</ULink>
         <ULink as="button">About</ULink>
       </div>

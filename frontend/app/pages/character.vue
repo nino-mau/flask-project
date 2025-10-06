@@ -1,11 +1,11 @@
 <template>
   <div class="size-full flex items-center justify-center">
-    <!-- <CardCharacter -->
-    <!--   v-if="character.character" -->
-    <!--   :character="character.character" -->
-    <!-- /> -->
+    <CardCharacter3
+      v-if="character.character"
+      :character="character.character"
+    />
 
-    <CardCharacter2 :character="testData" />
+    <!-- <CardCharacter3 :character="testData" /> -->
   </div>
 </template>
 

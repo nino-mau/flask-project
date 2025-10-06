@@ -1,7 +1,7 @@
 <template>
   <UPageCard
     variant="subtle"
-    :highlight="true"
+    :highlight="false"
     highlight-color="primary"
     class="group w-auto min-w-[350px] overflow-hidden max-w-[550px] h-fit rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
     :ui="{
@@ -11,11 +11,11 @@
     <template #body>
       <div class="flex flex-col justify-start">
         <div
-          class="relative h-[300px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900"
+          class="relative h-[270px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900"
         >
           <NuxtImg
             v-if="props.character?.image_hash"
-            class="size-full object-cover"
+            class="size-full object-fill"
             :src="props.character?.image_hash"
             :alt="props.character?.name || 'Character image'"
           />
