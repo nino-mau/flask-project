@@ -5,10 +5,10 @@ const characterStore = useCharacterStore();
 
 <template>
   <div class="w-full h-screen flex flex-col">
-    <div v-if="!characterStore.isLoading" class="h-[100px]">
+    <div v-if="!characterStore.isLoading">
       <NavbarMain />
     </div>
-    <div class="w-full grow">
+    <div class="w-full relative grow">
       <slot />
     </div>
   </div>

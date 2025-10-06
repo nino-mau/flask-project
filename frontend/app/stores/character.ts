@@ -24,9 +24,20 @@ export const useCharacterStore = defineStore('characterStore', {
     },
 
     async get(characterId: string) {
+      const toast = useToast();
       const data = await $fetch.raw(
         `/api/character?character_id=${characterId}`
       );
+      console.log(data);
+
+      if (data.status !== 200) {
+        toast.add({
+          title: 'Failed to fetch character',
+          color: 'error',
+          icon: 'i-lucide-circle-x'
+        });
+        return;
+      }
 
       // Add character to store
       this.character = data._data.character;
@@ -34,12 +45,29 @@ export const useCharacterStore = defineStore('characterStore', {
     },
 
     async delete(characterId: string) {
+      const toast = useToast();
       const data = await $fetch.raw(
-        `/api/character?character_id=${characterId}`
+        `/api/character?character_id=${characterId}`,
+        { method: 'DELETE' }
       );
+      console.log(data);
 
-      // Add character to store
-      this.character = data._data.character;
+      if (data.status !== 200) {
+        toast.add({
+          title: 'Failed to delete character',
+          color: 'error',
+          icon: 'i-lucide-circle-x'
+        });
+        return;
+      }
+
+      toast.add({
+        title: 'Succesfully deleted character',
+        color: 'success',
+        icon: 'i-lucide-circle-check-big'
+      });
+      // Remove character from store
+      this.character = null;
       console.log(data);
     }
   }
