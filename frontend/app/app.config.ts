@@ -2,11 +2,11 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'blue',
-      secondary: 'secondary',
+      secondary: 'pink',
       info: 'info',
       warning: 'warning',
       error: 'error',
-      accent: 'accent'
+      accent: 'violet'
     }
   }
 });
