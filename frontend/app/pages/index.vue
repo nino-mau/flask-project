@@ -2,7 +2,7 @@
   <div class="size-full flex items-center justify-center">
     <div class="flex flex-col gap-0 items-center justify-center">
       <UPageCTA
-        v-if="!isLoading"
+        v-if="!character.isLoading"
         description="Generate a character rpg card from any image, powered by AI"
         variant="naked"
       >
@@ -58,7 +58,8 @@
 import type { FormSubmitEvent } from '@nuxt/ui';
 import * as z from 'zod';
 
-const isLoading = useState('isLoading', () => true);
+// const isLoading = useState('isLoading', () => true);
+const character = useCharacterStore();
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MIN_DIMENSIONS = { width: 50, height: 50 };
@@ -126,25 +127,9 @@ async function onSubmit(event: FormSubmitEvent<schema>) {
   /**
    * Upload image
    */
-  const formData = new FormData();
-  formData.append('file', event.data.image);
-  console.log(formData);
-
-  try {
-    isLoading.value = true;
-    const data = await $fetch.raw('/api/character', {
-      method: 'POST',
-      body: formData
-    });
-    console.log(data);
-  } finally {
-    isLoading.value = false;
-  }
+  await character.create(event.data.image);
+  navigateTo('/character');
 }
-
-onMounted(() => {
-  isLoading.value = false;
-});
 </script>
 
 <style scoped></style>
