@@ -39,7 +39,13 @@ def delete_character():
             Character.ability2,
             Character.ability1_description,
             Character.ability2_description,
-            Character.image_id,
+            Character.alignment,
+            Character.faction,
+            Character.attack,
+            Character.defense,
+            Character.speed,
+            Character.luck,
+            Character.image,
         )
     )
     row = db.session.execute(stmt).one_or_none()
@@ -64,23 +70,29 @@ def get_character():
     character_id = request.args.get("character_id")
 
     stmt = db.select(Character).where(Character.id == character_id)
-    result = db.session.execute(stmt).scalars().one()
+    character = db.session.execute(stmt).scalars().one()
 
-    if not result:
+    if not character:
         return jsonify({"character": [], "msg": "Character doesn't exist"}), 500
 
     payload = {
-        "id": result.id,
-        "name": result.name,
-        "description": result.description,
-        "ability1": result.ability1,
-        "ability2": result.ability2,
-        "ability1_description": result.ability1_description,
-        "ability2_description": result.ability2_description,
+        "id": character.id,
+        "name": character.name,
+        "description": character.description,
+        "ability1": character.ability1,
+        "ability2": character.ability2,
+        "ability1_description": character.ability1_description,
+        "ability2_description": character.ability2_description,
+        "alignment": character.alignment,
+        "faction": character.faction,
+        "attack": character.attack,
+        "defense": character.defense,
+        "speed": character.speed,
+        "luck": character.luck,
         "image": {
-            "id": result.image.id if result.image else None,
-            "name": result.image.name if result.image else None,
-            "hash": result.image.hash if result.image else None,
+            "id": character.image.id if character.image else None,
+            "name": character.image.name if character.image else None,
+            "hash": character.image.hash if character.image else None,
         },
     }
 
@@ -163,7 +175,36 @@ def create_character():
         # )
         openrouter = OpenrouterService()
         res_raw = openrouter.query(
-            "Your goal is to generate characters card based on the image provided. Respond ONLY with valid JSON, no markdown formatting. Do not make the field too long \n Create a JSON object containing: name: (Name of that character), description: (Description of that character), ability1: (First ability of character), ability2: (Second ability of character), ability1_description: (Description of ability 1), ability2_description: (Description of ability 2)",
+            """
+            Return ONLY one JSON object (no markdown).
+
+            REQUIRED (13) keys in this exact order:
+            name, description, ability1, ability2, ability1_description, ability2_description,
+            alignment, faction, attack, defense, speed, luck
+
+            Rules:
+            1. Do not omit, rename, or add keys.
+            2. Use short, game-card length values (≤ 120 chars per description).
+            3. Numbers: integers 0–100 (attack/defense/speed/luck).
+            4. If unsure, make a best-fit guess (never use “N/A”).
+            5. Before responding, verify all 13 keys are present.
+
+            JSON skeleton to fill (respond with this filled in):
+            {
+                "name": "",
+                "description": "",
+                "ability1": "",
+                "ability2": "",
+                "ability1_description": "",
+                "ability2_description": "",
+                "alignment": "",
+                "faction": "",
+                "attack": 0,
+                "defense": 0,
+                "speed": 0,
+                "luck": 0
+            }
+            """,
             image_hash,
         )
 
@@ -190,8 +231,14 @@ def create_character():
         character.ability2_description = (
             character_data["ability2_description"] or res_raw
         )
+        character.alignment = character_data["alignment"]
+        character.faction = character_data["faction"]
+        character.attack = int(character_data["attack"]) or 0
+        character.defense = int(character_data["defense"]) or 0
+        character.speed = int(character_data["speed"]) or 0
+        character.luck = int(character_data["luck"]) or 0
         character.image_id = image_id
-        app.logger.info(character)
+        app.logger.info(character_data)
         db.session.add(character)
         db.session.commit()
 
@@ -206,8 +253,17 @@ def create_character():
                     "ability2": character.ability2,
                     "ability1_description": character.ability1_description,
                     "ability2_description": character.ability2_description,
-                    "image_id": character.image_id,
-                    "image_hash": image_hash,
+                    "alignment": character.alignment,
+                    "faction": character.faction,
+                    "attack": character.attack,
+                    "defense": character.defense,
+                    "speed": character.speed,
+                    "luck": character.luck,
+                    "image": {
+                        "id": character.image.id if character.image else None,
+                        "name": character.image.name if character.image else None,
+                        "hash": character.image.hash if character.image else None,
+                    },
                 },
             }
         ), 200

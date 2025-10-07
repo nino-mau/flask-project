@@ -1,4 +1,4 @@
-from sqlalchemy import Text, String, ForeignKey
+from sqlalchemy import Text, String, ForeignKey, Integer
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -27,6 +27,12 @@ class Character(db.Model):
     ability2: Mapped[str] = mapped_column(Text, nullable=False)
     ability1_description: Mapped[str] = mapped_column(Text, nullable=False)
     ability2_description: Mapped[str] = mapped_column(Text, nullable=False)
+    alignment: Mapped[str] = mapped_column(Text, nullable=False)
+    faction: Mapped[str] = mapped_column(Text, nullable=False)
+    attack: Mapped[int] = mapped_column(Integer, nullable=False)
+    defense: Mapped[int] = mapped_column(Integer, nullable=False)
+    speed: Mapped[int] = mapped_column(Integer, nullable=False)
+    luck: Mapped[int] = mapped_column(Integer, nullable=False)
     image_id: Mapped[str] = mapped_column(
         String, ForeignKey("images.id"), nullable=False
     )

@@ -1,6 +1,6 @@
-from flask import current_app as app
 from flask import Blueprint, jsonify
-from model import Character, Image, db
+from flask import current_app as app
+from model import Character, db
 
 characters_bp = Blueprint("characters_bp", __name__)
 
@@ -33,6 +33,12 @@ def get_characters():
                 "ability2": c.ability2,
                 "ability1_description": c.ability1_description,
                 "ability2_description": c.ability2_description,
+                "alignment": c.alignment,
+                "faction": c.faction,
+                "attack": c.attack,
+                "defense": c.defense,
+                "speed": c.speed,
+                "luck": c.luck,
                 "image": {
                     "id": c.image.id if c.image else None,
                     "name": c.image.name if c.image else None,
