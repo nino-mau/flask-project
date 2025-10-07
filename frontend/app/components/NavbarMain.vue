@@ -1,8 +1,10 @@
 <template>
   <UHeader>
     <template #title>
-      <UIcon name="i-lucide-trello" class="size-6 text-primary" />
-      <p class="text-xl text-highlighted font-bold">MySite</p>
+      <div class="flex flex-row items-center gap-1">
+        <IconSite :width="35" :height="35" color="var(--color-primary)" />
+        <p class="text-xl text-highlighted font-bold">Card Generator</p>
+      </div>
     </template>
     <template #right>
       <div class="flex flex-row gap-9">
