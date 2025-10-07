@@ -32,6 +32,7 @@
           </UFormField>
 
           <div class="flex flex-row gap-5 mt-15">
+            <!-- Button: Submit -->
             <UButton
               type="submit"
               size="xl"
@@ -39,11 +40,13 @@
               icon="i-lucide-save"
               label="Submit"
             />
+            <!-- Button: To Gallery -->
             <UButton
               size="xl"
               variant="outline"
               label="See Gallery"
               icon="i-lucide-image"
+              to="/characters"
             />
           </div>
         </UForm>
