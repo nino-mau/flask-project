@@ -1,7 +1,11 @@
 import type { Character } from '~/types/character';
 
 export const useCharacterStore = defineStore('characterStore', {
-  state: () => ({ character: null as Character | null, isLoading: false }),
+  state: () => ({
+    character: null as Character | null,
+    isLoading: false,
+    isScreenshotLoading: false
+  }),
   getters: {},
   actions: {
     async create(image: File) {
@@ -42,6 +46,31 @@ export const useCharacterStore = defineStore('characterStore', {
       // Add character to store
       this.character = data._data.character;
       console.log(data);
+    },
+
+    async screenshot(characterId: string) {
+      try {
+        console.log('Is screenshot loading');
+        this.isScreenshotLoading = true;
+
+        const toast = useToast();
+        const data = await $fetch.raw(
+          `/api/character/export?character_id=${characterId}`,
+          { method: 'GET' }
+        );
+
+        if (data.status !== 200) {
+          toast.add({
+            title: 'Failed to take screenshot',
+            color: 'error',
+            icon: 'i-lucide-circle-x'
+          });
+          return;
+        }
+        return data._data.image_hash;
+      } finally {
+        this.isScreenshotLoading = false;
+      }
     },
 
     async delete(characterId: string) {

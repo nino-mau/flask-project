@@ -3,6 +3,20 @@
     v-if="characterStore.character"
     class="size-full flex flex-col items-center justify-center"
   >
+    <UModal v-model:open="screenshotModalOpen" :dismissible="true">
+      <template #body>
+        <div class="flex flex-col items-center w-full gap-5">
+          <NuxtImg v-if="screenshotUrl" class="size-fit" :src="screenshotUrl" />
+          <UButton
+            size="xl"
+            label="Download"
+            icon="i-lucide-download"
+            @click="screenshotWrapper()"
+          />
+        </div>
+      </template>
+    </UModal>
+
     <!-- Button: Back to Gallery -->
     <UButton
       size="xl"
@@ -13,15 +27,22 @@
       class="absolute top-5 left-5"
     />
 
-    <CardCharacter ref="characterCard" :character="characterStore.character" />
+    <div id="card_character" class="card_character">
+      <CardCharacter
+        id="card_character"
+        ref="characterCard"
+        :character="characterStore.character"
+      />
+    </div>
     <div class="flex flex-row gap-5 mt-10">
-      <!-- Button: Export -->
+      <!-- Button: Download -->
       <UButton
+        :loading="characterStore.isScreenshotLoading"
         size="xl"
         variant="solid"
-        label="Export"
+        label="Download"
         icon="i-lucide-download"
-        @click="exportCard()"
+        @click="screenshotWrapper()"
       />
       <!-- Button: Delete -->
       <UButton
@@ -30,38 +51,42 @@
         color="error"
         icon="i-lucide-trash-2"
         label="Delete"
-        @click="[characterStore.delete(characterId), navigateTo('/characters')]"
+        @click="
+          async () => {
+            await characterStore.delete(characterId);
+            navigateTo('/characters');
+          }
+        "
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { toPng } from 'html-to-image';
-
 const route = useRoute();
 const characterStore = useCharacterStore();
 
 const characterId = ref(route.params.id as string);
-const characterCard = useTemplateRef('characterCard');
 
-const exportCard = async () => {
-  if (!characterCard.value?.$el) {
-    console.error('[Export Card] Node is null');
-  }
-  const dataUrl = await toPng(characterCard.value?.$el);
+const screenshotModalOpen = ref(false);
+const screenshotUrl = ref<undefined | string>(undefined);
 
-  console.log(dataUrl);
-
-  const link = document.createElement('a');
-  link.download = 'character-card.png';
-  link.href = dataUrl;
-  link.click();
+const screenshotWrapper = async () => {
+  const res = await characterStore.screenshot(characterId.value);
+  screenshotUrl.value = res;
+  downloadFile(res);
 };
+
+const downloadScreenshot = () => {
+  if (screenshotUrl.value) {
+    downloadFile(screenshotUrl.value);
+  }
+};
+
+defineShortcuts({
+  o: () => (screenshotModalOpen.value = !screenshotModalOpen.value)
+});
 
 // Update character store
 await characterStore.get(characterId.value);
-
-const { exportElement } = useExportImage();
-const save = () => exportElement(characterCard.value?.$el, 'png');
 </script>
