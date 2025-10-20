@@ -7,6 +7,7 @@ from flask_cors import CORS
 from model import db
 from routes.character import character_bp
 from routes.characters import characters_bp
+from routes.character.export import export_bp
 
 load_dotenv()
 
@@ -33,3 +34,5 @@ def get_db_connection():
 app.register_blueprint(character_bp, url_prefix="/api/character")
 
 app.register_blueprint(characters_bp, url_prefix="/api/characters")
+
+app.register_blueprint(export_bp, url_prefix="/api/character/export")

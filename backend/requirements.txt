@@ -8,3 +8,7 @@ dotenv
 cloudinary
 flask_sqlalchemy
 openai
+playwright
+flask[async]
+
+
