@@ -29,6 +29,36 @@ export default defineNuxtConfig({
     enableLogs: true // Optional: Enable console logs from module (default: true)
   },
 
+  vite: {
+    server: {
+      allowedHosts: ['frontend']
+    }
+  },
+
+  ui: {
+    theme: {
+      colors: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'info',
+        'success',
+        'warning',
+        'error',
+        'accent'
+      ]
+    }
+  },
+
+  colorMode: {
+    preference: 'dark'
+  },
+
+  app: {
+    layoutTransition: { name: 'layout', mode: 'out-in' },
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
+
   // Font configuration
   fonts: {
     defaults: {

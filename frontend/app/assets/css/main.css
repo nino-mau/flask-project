@@ -2,6 +2,7 @@
 @import '@nuxt/ui';
 @import './variables/index.css';
 @import './utilities.css';
+@import './transitions.css';
 
 /**
 * Contains global styles for the application
