@@ -10,5 +10,7 @@ flask_sqlalchemy
 openai
 playwright
 flask[async]
+cloud-sql-python-connector
+pg8000==1.31.5
 
 

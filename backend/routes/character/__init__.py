@@ -45,7 +45,7 @@ def delete_character():
             Character.defense,
             Character.speed,
             Character.luck,
-            Character.image,
+            Character.image_id,
         )
     )
     row = db.session.execute(stmt).one_or_none()
