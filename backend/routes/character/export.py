@@ -11,12 +11,15 @@ export_bp = Blueprint("export_bp", __name__)
 async def get_screenshot():
     character_id = request.args.get("character_id")
     app.logger.info(character_id)
+
+    base_url = "http://localhost:5173" if app.debug else "https://app-nino.org"
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
 
         await page.goto(
-            f"http://frontend:3000/character/{character_id}", wait_until="networkidle"
+            f"{base_url}/character/{character_id}", wait_until="networkidle"
         )
 
         element = page.locator(".card_character")
@@ -32,4 +35,6 @@ async def get_screenshot():
 
         app.logger.info(upload_result)
 
-        return jsonify({"msg": "success", "image_hash": upload_result["url"]}), 200
+        return jsonify(
+            {"msg": "success", "image_hash": upload_result["secure_url"]}
+        ), 200
