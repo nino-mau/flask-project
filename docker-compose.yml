@@ -1,6 +1,8 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     container_name: flask-backend
     ports:
       - '5000:5000'
@@ -12,18 +14,24 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DATABASE_URL=${DATABASE_URL}
+      - CLOUD_DB_PASSWORD=${CLOUD_DB_PASSWORD}
+      - CLOUD_DB_INSTANCE_PUBLIC_IP=${CLOUD_DB_INSTANCE_PUBLIC_IP}
+      - INSTANCE_CONNECTION_NAME=${INSTANCE_CONNECTION_NAME}
       - OLLAMA_MODEL=${OLLAMA_MODEL}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PYTHONUNBUFFERED=1
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/cloudsql-key.json
     depends_on:
       - db
     volumes:
       - ./backend:/app
+      - ./cloudsql-flask-key.json:/app/cloudsql-key.json:ro
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: nuxt-app
     ports:
       - '3000:3000'

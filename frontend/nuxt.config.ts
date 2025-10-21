@@ -10,7 +10,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:5000/api'
+      apiBase: ''
     }
   },
 
@@ -81,11 +81,5 @@ export default defineNuxtConfig({
         display: 'swap'
       }
     ]
-  },
-
-  // Activate page transitions globally
-  app: {
-    layoutTransition: { name: 'layout', mode: 'out-in' },
-    pageTransition: { name: 'page', mode: 'out-in' }
   }
 });
